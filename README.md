@@ -1,22 +1,27 @@
 # 게이머즈 | 온라인 게임 거래소
 
-경북대학교 COMP322 Team 1의 Phase 4 프로젝트입니다. Phase 2에서 설계한 Oracle DB를 사용해 Phase 3의 JDBC 콘솔 기능을 웹에서 제공하는 것이 목표입니다.
+경북대학교 COMP322 데이타베이스 강의 프로젝트 Team 1의 Phase 4 프로젝트입니다. Phase 2에서 설계한 Oracle DB를 사용해 Phase 3의 JDBC 콘솔 기능을 웹에서 제공하는 것이 목표입니다.
 
 ## 개발 환경
 
-강의 실습과 같은 JDK 17, Eclipse IDE for Enterprise Java and Web Developers, Apache Tomcat 10.1(강의의 예시는 10.1.61), JSP, Oracle Thin JDBC(`ojdbc10.jar`)를 사용합니다. Eclipse에서 Dynamic Web Project를 만들고 Tomcat 10.1을 실행 환경으로 지정합니다.
+- JDK 17
+- Eclipse IDE for Enterprise Java and Web Developers
+- Apache Tomcat 10.1
 
-팀원별로 Phase 2 스키마가 설치된 Oracle 계정으로 연결합니다. 접속 정보는 로컬에서 설정합니다. DB 문자 집합이 `KO16MSWIN949`라면 사용 중인 Oracle JDBC 릴리스에 맞는 `orai18n.jar`도 Tomcat의 실행 클래스 경로에 추가합니다.
+Eclipse에서 Dynamic Web Project를 만들고 Tomcat 10.1을 실행 환경으로 지정합니다.
+* * 백엔드는 Java Servlet과 Oracle Thin JDBC, 프론트엔드는 React로 구현하며, JSON API로 연동합니다.
+  * React 개발 서버에서는 API 요청을 Tomcat으로 프록시하고, 로그인 상태는 Tomcat 세션 쿠키로 유지합니다.
+  * 팀원별로 프로젝트 스키마와 데이터가 설치된 Oracle 계정에 연결합니다.
+  * DB 접속 정보와 관리자로 사용할 기존 회원의 LoginID는 로컬 설정 파일에서 지정하며, 해당 파일은 Git에 포함하지 않습니다.
 
 ## Phase 4 범위
 
-- Phase 3의 조회·삽입·삭제·변경에 해당하는 기능을 웹에 구현하고 Phase 2 DB에 연결합니다.
-- 여러 사용자가 동시에 접속할 때 데이터 일관성을 지키도록 트랜잭션을 적용하고 확인합니다.
-- 각 팀원은 실제 작업을 본인 브랜치에 커밋하고 PR로 변경을 공유합니다. 팀의 작업은 GitHub 커밋 로그로 평가됩니다.
+- Phase 3의 Q01~Q10 조회, 로그인·로그아웃, 관심등록 추가·삭제, 회원정보 조회·변경을 웹에 구현하고 Phase 2 DB에 연결합니다.
+- 기존 매물을 최저가·등록 시각 순으로 자동 매칭해 구매하는 기능을 구현합니다.
+- 구매에 따른 재화·아이템·주문·체결 기록을 하나의 트랜잭션으로 처리하고, 동시 요청의 데이터 일관성과 오류 시 롤백을 검증합니다.
+- 각 팀원은 본인 브랜치에 실제 작업을 커밋하고 PR로 변경을 공유합니다. 팀의 작업은 GitHub 커밋 로그로 평가됩니다.
 
-## 제출
-
-2026년 12월 1일 01:59:59까지 팀장이 LMS에 제출하며, 팀 대표 1인이 발표합니다.
+## 제출 예정 파일
 
 | 파일 | 내용 |
 | --- | --- |
