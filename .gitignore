@@ -25,6 +25,9 @@ target/
 *.class
 *.log
 *.jar
+!/backend/src/main/webapp/WEB-INF/lib/gson-2.15.0.jar
+!/backend/src/main/webapp/WEB-INF/lib/ojdbc10.jar
+!/backend/src/main/webapp/WEB-INF/lib/orai18n.jar
 *.war
 
 # 제출 압축 파일 및 Python 캐시
