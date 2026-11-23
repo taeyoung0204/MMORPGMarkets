@@ -96,10 +96,9 @@ function App() {
       const result = await request("/session");
       setUser(result.loginUser ?? null);
       setCsrf(result.csrfToken ?? "");
+      setSessionReady(true);
     } catch (e) {
       setError((e as Error).message);
-    } finally {
-      setSessionReady(true);
     }
   }, []);
 
@@ -122,6 +121,9 @@ function App() {
     setLoading(true);
     setError("");
     try {
+      if (csrf === "") {
+        void loadSession();
+      }
       const result = await request(
         "/login",
         {
@@ -151,13 +153,12 @@ function App() {
         csrf,
       );
       flash(result.message || "로그아웃했습니다.");
-    } catch (e) {
-      setError((e as Error).message);
-    } finally {
       setUser(null);
       setCsrf("");
       setPage("market");
       void loadSession();
+    } catch (e) {
+      setError((e as Error).message);
     }
   }
 
