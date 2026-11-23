@@ -96,9 +96,12 @@ function App() {
       const result = await request("/session");
       setUser(result.loginUser ?? null);
       setCsrf(result.csrfToken ?? "");
-      setSessionReady(true);
+      return result.csrfToken ?? null;
     } catch (e) {
       setError((e as Error).message);
+      return null;
+    } finally {
+      setSessionReady(true);
     }
   }, []);
 
