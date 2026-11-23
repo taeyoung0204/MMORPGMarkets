@@ -92,7 +92,6 @@ public class MarketServlet extends HttpServlet {
         if (itemId == null) {
             throw new IllegalArgumentException("itemId가 필요합니다.");
         }
-        long memberId = (Long) request.getAttribute("targetMemberId");
         String asOf = LocalDateTime.now(KST).format(DATE_TIME);
         Map<String, Object> item;
         List<Map<String, Object>> rows;
@@ -102,13 +101,13 @@ public class MarketServlet extends HttpServlet {
                 Json.error(response, 404, "품목을 찾을 수 없습니다.");
                 return;
             }
-            rows = findListings(connection, itemId, memberId, asOf);
+            rows = findListings(connection, itemId, asOf);
         }
         Json.send(response, 200, Map.of("item", item, "rows", rows,
-                "filters", Map.of("itemId", itemId, "memberId", memberId, "asOf", asOf)));
+                "filters", Map.of("itemId", itemId, "asOf", asOf)));
     }
 
-    private List<Map<String, Object>> findListings(Connection connection, long itemId, long memberId, String asOf)
+    private List<Map<String, Object>> findListings(Connection connection, long itemId, String asOf)
             throws SQLException {
         String sql = """
                 SELECT L.ListingID, M.Nickname AS SellerNickname, L.BundlePrice,
@@ -119,18 +118,17 @@ public class MarketServlet extends HttpServlet {
                     SELECT ListingID, SUM(FilledBundles) AS FilledBundles
                     FROM EXECUTION_DETAIL GROUP BY ListingID
                 ) F ON F.ListingID = L.ListingID
-                WHERE L.ItemID = ? AND L.SellerID <> ? AND L.ListingStatus = '판매중'
+                WHERE L.ItemID = ? AND L.ListingStatus = '판매중'
                   AND L.ListedAt <= TO_DATE(?, 'YYYY-MM-DD HH24:MI:SS')
-                  AND L.ListedAt + 1 > TO_DATE(?, 'YYYY-MM-DD HH24:MI:SS')
+                  AND L.ListedAt + 365 > TO_DATE(?, 'YYYY-MM-DD HH24:MI:SS')
                   AND L.ListedBundles > NVL(F.FilledBundles, 0)
                 ORDER BY L.BundlePrice, L.ListedAt
                 """;
         List<Map<String, Object>> rows = new ArrayList<>();
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, itemId);
-            statement.setLong(2, memberId);
+            statement.setString(2, asOf);
             statement.setString(3, asOf);
-            statement.setString(4, asOf);
             try (ResultSet result = statement.executeQuery()) {
                 while (result.next()) {
                     rows.add(Map.of("listingId", result.getLong("ListingID"),
