@@ -124,9 +124,8 @@ function App() {
     setLoading(true);
     setError("");
     try {
-      if (csrf === "") {
-        void loadSession();
-      }
+      const token = csrf || (await loadSession());
+      if (!token) return;
       const result = await request(
         "/login",
         {
