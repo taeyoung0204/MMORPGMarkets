@@ -18,7 +18,7 @@ import market.auth.Auth;
 @WebFilter("/api/*")
 public class ApiFilter implements Filter {
     private static final Map<String, Boolean> MEMBER_QUERIES = Map.of(
-            "/api/me/inventory", false, "/api/favorites", false, "/api/market/item", false,
+            "/api/me/inventory", false, "/api/favorites", false, "/api/market/item", true,
             "/api/me/sales", true, "/api/me/orders", true);
 
     @Override

@@ -39,7 +39,7 @@ Tomcat 세션 쿠키로 로그인 상태를 유지한다. React는 같은 출처
 | GET 경로 · 기능 | 입력 | 결과 필드 |
 | --- | --- | --- |
 | `/market` · 거래소 검색 (Q01) | `category` 기본값 `강화 재료`, `name` 선택 | `rows`의 `itemId`, `itemName`, `category`, `bundleSize` |
-| `/market/item` · 매물 상세 (Q08) | `itemId` 필수 | `item`의 `itemId`, `itemName`, `bundleSize`. `rows`의 `listingId`, `sellerNickname`, `bundlePrice`, `remainingBundles`, `listedAt` |
+| `/market/item` · 매물 상세 (Q08) | `itemId` 필수, 관리자만 `memberId` 선택 | `item`의 `itemId`, `itemName`, `bundleSize`. `rows`의 `listingId`, `sellerNickname`, `bundlePrice`, `remainingBundles`, `listedAt` |
 | `/market/prices` · 시세 (Q09) | `itemId`, `from`, `until` 모두 선택 | `rows`의 `itemId`, `itemName`, `tradeDate`, `averagePrice`, `soldBundles` |
 | `/favorites` · 관심 목록 (전체 / Q05) | `view=all` 기본값, `view=available` 구매 가능 | 두 보기 모두 `rows`의 `itemId`, `itemName`, `category`, `addedAt` |
 | `/me/inventory` · 내 보유 (Q02 / Q10) | `view=all` 기본값, `view=notFavorited` 관심 미등록 | `rows`의 `itemId`, `itemName`. `all`에서는 `ownedCount`도 전달 |
@@ -52,8 +52,10 @@ Tomcat 세션 쿠키로 로그인 상태를 유지한다. React는 같은 출처
 - 분류는 `강화 재료`, `각인서`, `전투 용품`, `생활`, `모험의 서`다.
 - 주문 상태는 `전량체결`, `부분체결`, `미체결`이다. 복수 선택은 `?view=status&status=부분체결&status=미체결`처럼 보내고, `status` 생략 시 `부분체결`과 `미체결`을 조회한다.
 - 시세의 `from`, `until`은 `datetime-local` 값인 `yyyy-MM-ddTHH:mm`으로 보낸다. 시작시각은 포함하고 종료시각은 제외한다.
-- 일반 회원의 조회 대상은 서버가 로그인 세션에서 정한다. 관리자는 Q02·Q03·Q05·Q06·Q07·Q08·Q10에서 `memberId`로 대상 회원을 지정한다. Q03·Q06·Q07은 관리자가 `memberId`를 생략하면 전체를 조회한다. 다른 대상 회원별 조회에서는 관리자의 `memberId`가 필수다.
+- 일반 회원의 조회 대상은 서버가 로그인 세션에서 정한다. 관리자는 Q02·Q03·Q05·Q06·Q07·Q08·Q10에서 `memberId`로 대상 회원을 지정한다. Q03·Q06·Q07·Q08은 관리자가 `memberId`를 생략하면 전체를 조회한다. 다른 대상 회원별 조회에서는 관리자의 `memberId`가 필수다.
+- Q08은 조회 대상 회원의 매물을 제외한다. 관리자가 `memberId`를 생략하면 해당 품목의 유효 매물 전체를 반환하고 `filters.memberId`는 `null`이다. 구매 견적·체결의 자기 매물 제외 기준은 실제 로그인한 구매자다.
 - Q05·Q08은 서버의 조회 기준시각을 `filters.asOf`로 반환한다. 형식은 `yyyy-MM-dd HH:mm:ss`다. 화면에 기준시각을 표시한다.
+- 매물 유효기간은 등록시각부터 365일이다. Q05·Q08과 구매 견적·체결은 등록시각이 지났거나 같은 시점부터 만료시각 직전까지의 매물만 대상으로 한다.
 - 매물 상세의 `rows`가 비면 **매물 없음**, 시세의 `rows`가 비면 **거래 기록 없음**을 표시한다. 나머지 빈 목록은 **조회 결과 없음**으로 표시한다.
 
 검색 응답 예시

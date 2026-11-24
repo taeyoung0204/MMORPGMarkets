@@ -59,8 +59,8 @@ CREATE TABLE LISTING (
         OR (ListingStatus = '취소' AND DepositStatus = '취소정산완료' AND DepositSettledAt IS NOT NULL)
     ),
     CHECK (DepositSettledAt IS NULL OR DepositSettledAt >= ListedAt),
-    CHECK (ListingStatus <> '만료' OR DepositSettledAt >= ListedAt + 1),
-    CHECK (ListingStatus NOT IN ('판매완료', '취소') OR DepositSettledAt < ListedAt + 1)
+    CHECK (ListingStatus <> '만료' OR DepositSettledAt >= ListedAt + 365),
+    CHECK (ListingStatus NOT IN ('판매완료', '취소') OR DepositSettledAt < ListedAt + 365)
 );
 
 CREATE TABLE PURCHASE_ORDER (
