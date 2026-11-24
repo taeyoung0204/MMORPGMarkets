@@ -123,17 +123,20 @@ function App() {
     e.preventDefault();
     setLoading(true);
     setError("");
+  
     try {
       const token = csrf || (await loadSession());
       if (!token) return;
+  
       const result = await request(
         "/login",
         {
           method: "POST",
           body: JSON.stringify({ loginId, password }),
         },
-        csrf,
+        token,
       );
+  
       setUser(result.loginUser ?? null);
       setCsrf(result.csrfToken ?? "");
       setPassword("");
@@ -141,7 +144,16 @@ function App() {
       flash(result.message || "로그인했습니다.");
       setPage("market");
     } catch (e) {
-      setError((e as Error).message);
+      const error = e as Error & { status?: number };
+  
+      if (error.status === 403) {
+        setCsrf("");
+        if (await loadSession()) {
+          setError("세션을 갱신했습니다. 다시 로그인해 주세요.");
+        }
+      } else {
+        setError(error.message);
+      }
     } finally {
       setLoading(false);
     }
