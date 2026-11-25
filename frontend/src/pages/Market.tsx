@@ -157,6 +157,7 @@ export default function Market({
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && void load()}
+                disabled={loading}
               />
             </div>
           </div>
@@ -203,6 +204,7 @@ export default function Market({
                           size="sm"
                           variant="outline"
                           onClick={() => void openItem(row.itemId)}
+                          disabled={loading}
                         >
                           매물 보기
                         </Button>
