@@ -121,14 +121,18 @@ function App() {
     }
   }
 
-  async function logout() {
+  async function logout(send_req: boolean) {
     try {
-      const result = await request(
-        "/logout",
-        { method: "POST", body: "{}" },
-        csrf,
-      );
-      flash(result.message || "로그아웃했습니다.");
+      if (send_req) {
+        const result = await request(
+          "/logout",
+          { method: "POST", body: "{}" },
+          csrf,
+        );
+        flash(result.message || "로그아웃했습니다.");
+      } else {
+        flash("다시 로그인 해주세요.");
+      }
       setUser(null);
       setCsrf("");
       setPage("market");
@@ -196,7 +200,7 @@ function App() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => void logout()}
+                  onClick={() => void logout(true)}
                 >
                   <LogOut size={15} className="mr-2" />
                   로그아웃
@@ -249,6 +253,16 @@ function App() {
             >
               {error}
             </div>
+          )}
+          {page === "market" && (
+            <Market
+              user={user}
+              logout={() => logout(false)}
+              loading={loading}
+              setLoading={setLoading}
+              setError={setError}
+              onRequireLogin={() => setLoginOpen(true)}
+            />
           )}
         </main>
       </div>
