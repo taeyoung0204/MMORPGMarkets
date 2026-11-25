@@ -15,6 +15,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { type User, type Row, type ApiResult, request } from "@/api";
+import { money } from "@/lib/utils";
 
 type MarketProps = {
   user: User | null;
@@ -23,11 +24,14 @@ type MarketProps = {
   setLoading: (value: boolean) => void;
   setError: (value: string) => void;
   onRequireLogin: () => void;
+  post: (
+    path: string,
+    body: Row,
+    onSuccess?: () => void | Promise<void>,
+  ) => Promise<void>;
 };
 
 const categories = ["강화 재료", "각인서", "전투 용품", "생활", "모험의 서"];
-
-const money = (v?: number) => `${Number(v ?? 0).toLocaleString("ko-KR")} G`;
 
 export default function Market({
   user,
@@ -36,6 +40,7 @@ export default function Market({
   setLoading,
   setError,
   onRequireLogin,
+  post,
 }: MarketProps) {
   const [category, setCategory] = useState("강화 재료");
   const [name, setName] = useState("");
@@ -267,7 +272,14 @@ export default function Market({
               닫기
             </Button>
 
-            <Button disabled={!user || loading} onClick={() => {}}>
+            <Button
+              disabled={!user || loading}
+              onClick={() => {
+                detail?.itemId &&
+                  void post("/favorites/add", { itemId: detail.itemId });
+                setDetailOpen(false);
+              }}
+            >
               관심 등록
             </Button>
 
