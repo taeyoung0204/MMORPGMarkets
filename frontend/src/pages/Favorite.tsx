@@ -1,6 +1,7 @@
 import { request, type ApiResult, type Row, type User } from "@/api";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { dateText } from "@/lib/utils";
 import { useCallback, useState } from "react";
@@ -37,7 +38,9 @@ export default function Favorite({
 }: FavoriteProps) {
   const [view, setView] = useState("all");
   const [data, setData] = useState<ApiResult>({ rows: [] });
-
+  const [specifiedMemberId, setSpecifiedMemberId] = useState(
+    `${user.memberId}`,
+  );
   const load = useCallback(async () => {
     if (!user) {
       onRequireLogin();
@@ -51,7 +54,7 @@ export default function Favorite({
       const params = new URLSearchParams();
 
       params.set("view", view);
-      params.set("memberId", `${user.memberId}`);
+      params.set("memberId", `${specifiedMemberId}`);
       const result = await request(`/favorites?${params}`);
       setData(result);
     } catch (e) {
@@ -65,7 +68,32 @@ export default function Favorite({
     } finally {
       setLoading(false);
     }
-  }, [user, setData, setLoading, setError, logout, onRequireLogin, view]);
+  }, [
+    user,
+    setData,
+    setLoading,
+    setError,
+    logout,
+    onRequireLogin,
+    view,
+    specifiedMemberId,
+  ]);
+
+  const MemberFilter = useCallback(
+    ({ value, onChange }: { value: string; onChange: (v: string) => void }) => {
+      return (
+        <div className="space-y-2">
+          <Label>대상 회원 ID</Label>
+          <Input
+            className="w-44"
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+          />
+        </div>
+      );
+    },
+    [],
+  );
 
   const table = useCallback(
     (rowsToShow: Row[], cols: string[]) => {
@@ -79,7 +107,7 @@ export default function Favorite({
                 {cols.map((c) => (
                   <th key={c}>{labels[c]}</th>
                 ))}
-                <th>관리</th>
+                {specifiedMemberId === `${user.memberId}` && <th>관리</th>}
               </tr>
             </thead>
             <tbody>
@@ -89,25 +117,27 @@ export default function Favorite({
                     <td key={c}>{row[c]}</td>
                   ))}
 
-                  <td>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      disabled={loading}
-                      onClick={() =>
-                        void post(
-                          "/favorites/remove",
-                          {
-                            itemId: row.itemId,
-                            memberId: user.memberId,
-                          },
-                          load,
-                        )
-                      }
-                    >
-                      삭제
-                    </Button>
-                  </td>
+                  {specifiedMemberId === `${user.memberId}` && (
+                    <td>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        disabled={loading}
+                        onClick={() =>
+                          void post(
+                            "/favorites/remove",
+                            {
+                              itemId: row.itemId,
+                              memberId: user.memberId,
+                            },
+                            load,
+                          )
+                        }
+                      >
+                        삭제
+                      </Button>
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>
@@ -133,6 +163,12 @@ export default function Favorite({
             <option value="available">구매 가능</option>
           </select>
         </div>
+        {user?.admin && (
+          <MemberFilter
+            value={specifiedMemberId}
+            onChange={setSpecifiedMemberId}
+          />
+        )}
         <Button onClick={() => void load()} disabled={loading}>
           조회
         </Button>
