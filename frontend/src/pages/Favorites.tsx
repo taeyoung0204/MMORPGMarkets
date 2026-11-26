@@ -14,7 +14,7 @@ const labels: Record<string, string> = {
 };
 const columns = ["itemId", "itemName", "category", "addedAt"];
 
-type FavoriteProps = {
+type FavoritesProps = {
   user: User | null;
   logout: () => void;
   loading: boolean;
@@ -27,7 +27,7 @@ type FavoriteProps = {
     onSuccess?: () => void | Promise<void>,
   ) => Promise<void>;
 };
-export default function Favorite({
+export default function Favorites({
   user,
   logout,
   loading,
@@ -35,7 +35,7 @@ export default function Favorite({
   setError,
   onRequireLogin,
   post,
-}: FavoriteProps) {
+}: FavoritesProps) {
   const [view, setView] = useState("all");
   const [data, setData] = useState<ApiResult>({ rows: [] });
   const [specifiedMemberId, setSpecifiedMemberId] = useState(

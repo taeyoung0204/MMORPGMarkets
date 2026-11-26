@@ -25,7 +25,7 @@ import { Label } from "@/components/ui/label";
 import "./index.css";
 import { type User, request, type Row } from "@/api";
 import Market from "@/pages/Market";
-import Favorite from "@/pages/Favorite";
+import Favorites from "@/pages/Favorites";
 
 type Page =
   | "market"
@@ -305,7 +305,7 @@ function App() {
             />
           )}
           {page === "favorites" && (
-            <Favorite
+            <Favorites
               user={user}
               logout={() => logout(false)}
               loading={loading}
