@@ -23,8 +23,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import "./index.css";
+import { type User, request } from "@/api";
+import Market from "@/pages/Market";
 
-type User = { memberId: number; loginId: string; admin: boolean };
 type Page =
   | "market"
   | "favorites"
@@ -34,45 +35,6 @@ type Page =
   | "profile"
   | "admin"
   | "prices";
-type Row = Record<string, any>;
-type ApiResult = {
-  rows?: Row[];
-  filters?: Row;
-  item?: Row;
-  profile?: Row;
-  loginUser?: User | null;
-  csrfToken?: string;
-  message?: string;
-  error?: string;
-};
-
-const API = "/mmorpg-markets/api";
-
-async function request(
-  path: string,
-  options: RequestInit = {},
-  csrf?: string,
-): Promise<ApiResult> {
-  const headers = new Headers(options.headers);
-  headers.set("Accept", "application/json");
-  if (options.body)
-    headers.set("Content-Type", "application/json; charset=UTF-8");
-  if (options.method === "POST" && csrf) headers.set("X-CSRF-Token", csrf);
-  const response = await fetch(`${API}${path}`, {
-    ...options,
-    headers,
-    credentials: "same-origin",
-  });
-  const data = (await response.json().catch(() => ({}))) as ApiResult;
-  if (!response.ok) {
-    const error = new Error(
-      data.error || `요청에 실패했습니다. (HTTP ${response.status})`,
-    );
-    (error as Error & { status?: number }).status = response.status;
-    throw error;
-  }
-  return data;
-}
 
 function App() {
   const [page, setPage] = useState<Page>("market");
@@ -123,11 +85,11 @@ function App() {
     e.preventDefault();
     setLoading(true);
     setError("");
-  
+
     try {
       const token = csrf || (await loadSession());
       if (!token) return;
-  
+
       const result = await request(
         "/login",
         {
@@ -136,7 +98,7 @@ function App() {
         },
         token,
       );
-  
+
       setUser(result.loginUser ?? null);
       setCsrf(result.csrfToken ?? "");
       setPassword("");
@@ -145,7 +107,7 @@ function App() {
       setPage("market");
     } catch (e) {
       const error = e as Error & { status?: number };
-  
+
       if (error.status === 403) {
         setCsrf("");
         if (await loadSession()) {
@@ -159,14 +121,18 @@ function App() {
     }
   }
 
-  async function logout() {
+  async function logout(send_req: boolean) {
     try {
-      const result = await request(
-        "/logout",
-        { method: "POST", body: "{}" },
-        csrf,
-      );
-      flash(result.message || "로그아웃했습니다.");
+      if (send_req) {
+        const result = await request(
+          "/logout",
+          { method: "POST", body: "{}" },
+          csrf,
+        );
+        flash(result.message || "로그아웃했습니다.");
+      } else {
+        flash("다시 로그인 해주세요.");
+      }
       setUser(null);
       setCsrf("");
       setPage("market");
@@ -234,7 +200,7 @@ function App() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => void logout()}
+                  onClick={() => void logout(true)}
                 >
                   <LogOut size={15} className="mr-2" />
                   로그아웃
@@ -287,6 +253,16 @@ function App() {
             >
               {error}
             </div>
+          )}
+          {page === "market" && (
+            <Market
+              user={user}
+              logout={() => logout(false)}
+              loading={loading}
+              setLoading={setLoading}
+              setError={setError}
+              onRequireLogin={() => setLoginOpen(true)}
+            />
           )}
         </main>
       </div>
