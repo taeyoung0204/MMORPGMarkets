@@ -315,7 +315,6 @@ function App() {
               loading={loading}
               setLoading={setLoading}
               setError={setError}
-              onRequireLogin={() => setLoginOpen(true)}
               post={post}
             />
           )}

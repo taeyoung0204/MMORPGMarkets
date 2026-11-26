@@ -20,7 +20,6 @@ type FavoritesProps = {
   loading: boolean;
   setLoading: (value: boolean) => void;
   setError: (value: string) => void;
-  onRequireLogin: () => void;
   post: (
     path: string,
     body: Row,
@@ -33,7 +32,6 @@ export default function Favorites({
   loading,
   setLoading,
   setError,
-  onRequireLogin,
   post,
 }: FavoritesProps) {
   const [view, setView] = useState("all");
@@ -43,11 +41,6 @@ export default function Favorites({
     `${user.memberId}`,
   );
   const load = useCallback(async () => {
-    if (!user) {
-      onRequireLogin();
-      return;
-    }
-
     setLoading(true);
     setError("");
 
@@ -76,7 +69,6 @@ export default function Favorites({
     setLoading,
     setError,
     logout,
-    onRequireLogin,
     view,
     specifiedMemberId,
     setShowRemove,
