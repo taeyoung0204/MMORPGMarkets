@@ -75,7 +75,7 @@ function App() {
           { method: "POST", body: JSON.stringify(body) },
           csrf,
         );
-        flash(result.message);
+        if (result.message) flash(result.message);
         await onSuccess?.();
       } catch (e) {
         const error = e as Error & { status?: number };
@@ -116,6 +116,10 @@ function App() {
   }, [sessionReady, user, page]);
 
   const navigate = (next: Page) => {
+    if (!user) {
+      setLoginOpen(true);
+      return;
+    }
     setPage(next);
     setError("");
   };
@@ -306,7 +310,7 @@ function App() {
           )}
           {page === "favorites" && (
             <Favorites
-              user={user}
+              user={user!}
               logout={() => logout(false)}
               loading={loading}
               setLoading={setLoading}

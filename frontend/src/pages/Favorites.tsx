@@ -15,7 +15,7 @@ const labels: Record<string, string> = {
 const columns = ["itemId", "itemName", "category", "addedAt"];
 
 type FavoritesProps = {
-  user: User | null;
+  user: User;
   logout: () => void;
   loading: boolean;
   setLoading: (value: boolean) => void;
@@ -38,6 +38,7 @@ export default function Favorites({
 }: FavoritesProps) {
   const [view, setView] = useState("all");
   const [data, setData] = useState<ApiResult>({ rows: [] });
+  const [showRemove, setShowRemove] = useState(true);
   const [specifiedMemberId, setSpecifiedMemberId] = useState(
     `${user.memberId}`,
   );
@@ -57,6 +58,7 @@ export default function Favorites({
       params.set("memberId", `${specifiedMemberId}`);
       const result = await request(`/favorites?${params}`);
       setData(result);
+      setShowRemove(`${user.memberId}` === specifiedMemberId);
     } catch (e) {
       const error = e as Error & { status?: number };
 
@@ -77,6 +79,7 @@ export default function Favorites({
     onRequireLogin,
     view,
     specifiedMemberId,
+    setShowRemove,
   ]);
 
   const MemberFilter = useCallback(
@@ -107,7 +110,7 @@ export default function Favorites({
                 {cols.map((c) => (
                   <th key={c}>{labels[c]}</th>
                 ))}
-                {specifiedMemberId === `${user.memberId}` && <th>관리</th>}
+                {showRemove && <th>관리</th>}
               </tr>
             </thead>
             <tbody>
@@ -117,7 +120,7 @@ export default function Favorites({
                     <td key={c}>{row[c]}</td>
                   ))}
 
-                  {specifiedMemberId === `${user.memberId}` && (
+                  {showRemove && (
                     <td>
                       <Button
                         size="sm"
@@ -163,7 +166,7 @@ export default function Favorites({
             <option value="available">구매 가능</option>
           </select>
         </div>
-        {user?.admin && (
+        {user.admin && (
           <MemberFilter
             value={specifiedMemberId}
             onChange={setSpecifiedMemberId}
@@ -174,7 +177,7 @@ export default function Favorites({
         </Button>
       </div>
       <Card>
-        <CardContent className="p-0">{table(data.rows, columns)}</CardContent>
+        <CardContent className="p-0">{table(data.rows!, columns)}</CardContent>
       </Card>
       <p className="text-xs text-muted-foreground">
         관심 품목 추가는 거래소 매물 상세에서 할 수 있습니다.
