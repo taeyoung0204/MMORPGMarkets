@@ -24,6 +24,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import "./index.css";
 import { type User, request, type Row } from "@/api";
+import Admin from "@/pages/Admin";
 import Market from "@/pages/Market";
 import Favorites from "@/pages/Favorites";
 import Inventory from "@/pages/Inventory";
@@ -327,6 +328,14 @@ function App() {
               {page === "inventory" && (
                 <Inventory
                   user={user}
+                  logout={() => logout(false)}
+                  loading={loading}
+                  setLoading={setLoading}
+                  setError={setError}
+                />
+              )}
+              {page === "admin" && (
+                <Admin
                   logout={() => logout(false)}
                   loading={loading}
                   setLoading={setLoading}
