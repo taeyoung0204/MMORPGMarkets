@@ -29,6 +29,7 @@ import Favorites from "@/pages/Favorites";
 import Inventory from "@/pages/Inventory";
 import Prices from "@/pages/Prices";
 import Sales from "@/pages/Sales";
+import Profile from "@/pages/Profile";
 
 type Page =
   | "market"
@@ -347,6 +348,15 @@ function App() {
                   loading={loading}
                   setLoading={setLoading}
                   setError={setError}
+                />
+              )}
+              {page === "profile" && (
+                <Profile
+                  logout={() => logout(false)}
+                  loading={loading}
+                  setLoading={setLoading}
+                  setError={setError}
+                  post={post}
                 />
               )}
             </>
