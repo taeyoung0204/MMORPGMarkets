@@ -28,6 +28,7 @@ import Market from "@/pages/Market";
 import Favorites from "@/pages/Favorites";
 import Inventory from "@/pages/Inventory";
 import Prices from "@/pages/Prices";
+import Sales from "@/pages/Sales";
 import Profile from "@/pages/Profile";
 
 type Page =
@@ -334,6 +335,15 @@ function App() {
               )}
               {page === "prices" && (
                 <Prices
+                  logout={() => logout(false)}
+                  loading={loading}
+                  setLoading={setLoading}
+                  setError={setError}
+                />
+              )}
+              {page === "sales" && (
+                <Sales
+                  user={user}
                   logout={() => logout(false)}
                   loading={loading}
                   setLoading={setLoading}
