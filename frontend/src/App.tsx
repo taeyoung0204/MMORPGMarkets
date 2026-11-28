@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { FormEvent, ReactNode } from "react";
 import {
   Activity,
@@ -23,8 +23,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import "./index.css";
-import { type User, request } from "@/api";
+import { type User, request, type Row } from "@/api";
 import Market from "@/pages/Market";
+import Favorites from "@/pages/Favorites";
 
 type Page =
   | "market"
@@ -48,10 +49,48 @@ function App() {
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
 
-  const flash = (message: string) => {
+  const timerRef = useRef<number | null>(null);
+
+  const flash = useCallback((message: string) => {
     setNotice(message);
-    window.setTimeout(() => setNotice(""), 3500);
-  };
+
+    if (timerRef.current !== null) {
+      window.clearTimeout(timerRef.current);
+    }
+
+    timerRef.current = window.setTimeout(() => {
+      setNotice("");
+      timerRef.current = null;
+    }, 3500);
+  }, []);
+
+  const post = useCallback(
+    async (path: string, body: Row, onSuccess?: () => void | Promise<void>) => {
+      setLoading(true);
+      setError("");
+
+      try {
+        const result = await request(
+          path,
+          { method: "POST", body: JSON.stringify(body) },
+          csrf,
+        );
+        if (result.message) flash(result.message);
+        await onSuccess?.();
+      } catch (e) {
+        const error = e as Error & { status?: number };
+
+        if (error.status === 401) {
+          logout(false);
+        } else {
+          setError((e as Error).message);
+        }
+      } finally {
+        setLoading(false);
+      }
+    },
+    [setLoading, setError, flash, logout],
+  );
 
   const loadSession = useCallback(async () => {
     try {
@@ -77,6 +116,10 @@ function App() {
   }, [sessionReady, user, page]);
 
   const navigate = (next: Page) => {
+    if (!user) {
+      setLoginOpen(true);
+      return;
+    }
     setPage(next);
     setError("");
   };
@@ -262,6 +305,17 @@ function App() {
               setLoading={setLoading}
               setError={setError}
               onRequireLogin={() => setLoginOpen(true)}
+              post={post}
+            />
+          )}
+          {page === "favorites" && (
+            <Favorites
+              user={user!}
+              logout={() => logout(false)}
+              loading={loading}
+              setLoading={setLoading}
+              setError={setError}
+              post={post}
             />
           )}
         </main>
