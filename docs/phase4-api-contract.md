@@ -86,6 +86,18 @@ Tomcat 세션 쿠키로 로그인 상태를 유지한다. React는 같은 출처
 
 예를 들어 관심 추가 본문은 `{"itemId":6884308}`이다. 요청 중에는 변경 버튼을 중복 누르지 않도록 처리한다. 실패하면 `error`를 표시하고 필요한 데이터를 다시 조회한다.
 
+## 구매 API
+
+| 요청 | 입력 | 성공 응답 |
+| --- | --- | --- |
+| `GET /purchase/quote` | `itemId`, `requestedBundles` | `quoteId`, `itemId`, `requestedBundles`, `availableBundles`, `suggestedAvgPrice`, `quotedPayment`, `goldBalance` |
+| `POST /purchase` | `quoteId`, `confirmedAvgPrice`, `requestKey` | `orderId`, `orderStatus`, `requestedBundles`, `filledBundles`, `unfilledBundles`, `maxPayment`, `actualPayment`, `refund`, `message` |
+
+- `suggestedAvgPrice`는 견적금액을 요청 묶음 수로 나눈 뒤 올림한 값이다. 사용자가 수정한 양의 정수 단가를 `confirmedAvgPrice`로 보낸다. 화면의 최대 지불 금액은 확정 평균 단가와 요청 묶음 수의 곱이다.
+- 서버는 세션의 마지막 성공 견적을 사용한다. 품목·수량을 바꾸면 새 견적을 요청한다. 관리자로 로그인해도 본인 기준으로 구매한다.
+- 구매 확인마다 새 UUID `requestKey`를 만든다. 응답을 받지 못한 구매는 같은 본문과 같은 키로 재전송한다. 완료된 요청을 재전송하면 기존 주문 결과가 돌아온다. 다음 구매는 새 견적을 받은 뒤 진행한다.
+- 전량체결·부분체결·미체결은 모두 200이다. 결과를 표시하고 매물·보유·잔액·주문을 다시 조회한다. 매물 없음, 견적 불일치, 잔액 부족은 409를 반환한다. 견적 요청 묶음 수가 구매 가능 수량을 넘으면 400을 반환한다.
+
 ## HTTP 상태
 
 | 상태 | 의미 |
