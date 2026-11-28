@@ -26,6 +26,7 @@ import "./index.css";
 import { type User, request, type Row } from "@/api";
 import Market from "@/pages/Market";
 import Favorites from "@/pages/Favorites";
+import Inventory from "@/pages/Inventory";
 
 type Page =
   | "market"
@@ -308,15 +309,28 @@ function App() {
               post={post}
             />
           )}
-          {page === "favorites" && (
-            <Favorites
-              user={user!}
-              logout={() => logout(false)}
-              loading={loading}
-              setLoading={setLoading}
-              setError={setError}
-              post={post}
-            />
+          {user && (
+            <>
+              {page === "favorites" && (
+                <Favorites
+                  user={user}
+                  logout={() => logout(false)}
+                  loading={loading}
+                  setLoading={setLoading}
+                  setError={setError}
+                  post={post}
+                />
+              )}
+              {page === "inventory" && (
+                <Inventory
+                  user={user}
+                  logout={() => logout(false)}
+                  loading={loading}
+                  setLoading={setLoading}
+                  setError={setError}
+                />
+              )}
+            </>
           )}
         </main>
       </div>

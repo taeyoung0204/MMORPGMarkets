@@ -1,9 +1,8 @@
 import { request, type ApiResult, type Row, type User } from "@/api";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { dateText } from "@/lib/utils";
+import { dateText, MemberFilter } from "@/lib/utils";
 import { useCallback, useState } from "react";
 
 const labels: Record<string, string> = {
@@ -73,22 +72,6 @@ export default function Favorites({
     specifiedMemberId,
     setShowRemove,
   ]);
-
-  const MemberFilter = useCallback(
-    ({ value, onChange }: { value: string; onChange: (v: string) => void }) => {
-      return (
-        <div className="space-y-2">
-          <Label>대상 회원 ID</Label>
-          <Input
-            className="w-44"
-            value={value}
-            onChange={(e) => onChange(e.target.value)}
-          />
-        </div>
-      );
-    },
-    [],
-  );
 
   const table = useCallback(
     (rowsToShow: Row[], cols: string[]) => {
@@ -162,6 +145,7 @@ export default function Favorites({
           <MemberFilter
             value={specifiedMemberId}
             onChange={setSpecifiedMemberId}
+            loading={loading}
           />
         )}
         <Button onClick={() => void load()} disabled={loading}>
