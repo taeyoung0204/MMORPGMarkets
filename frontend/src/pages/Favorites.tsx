@@ -2,15 +2,9 @@ import { request, type ApiResult, type Row, type User } from "@/api";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { dateText, MemberFilter } from "@/lib/utils";
+import { dateText, labels, MemberFilter } from "@/lib/utils";
 import { useCallback, useState } from "react";
 
-const labels: Record<string, string> = {
-  itemId: "품목 ID",
-  itemName: "아이템",
-  category: "분류",
-  addedAt: "등록일",
-};
 const columns = ["itemId", "itemName", "category", "addedAt"];
 
 type FavoritesProps = {

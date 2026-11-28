@@ -2,14 +2,8 @@ import { request, type Row, type User } from "@/api";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { MemberFilter } from "@/lib/utils";
+import { labels, MemberFilter } from "@/lib/utils";
 import { useCallback, useState } from "react";
-
-const labels: Record<string, string> = {
-  itemId: "품목 ID",
-  itemName: "아이템",
-  ownedCount: "보유 수량",
-};
 
 type InventoryProps = {
   user: User;

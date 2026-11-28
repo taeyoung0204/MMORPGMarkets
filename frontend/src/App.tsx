@@ -27,6 +27,7 @@ import { type User, request, type Row } from "@/api";
 import Market from "@/pages/Market";
 import Favorites from "@/pages/Favorites";
 import Inventory from "@/pages/Inventory";
+import Prices from "@/pages/Prices";
 
 type Page =
   | "market"
@@ -324,6 +325,14 @@ function App() {
               {page === "inventory" && (
                 <Inventory
                   user={user}
+                  logout={() => logout(false)}
+                  loading={loading}
+                  setLoading={setLoading}
+                  setError={setError}
+                />
+              )}
+              {page === "prices" && (
+                <Prices
                   logout={() => logout(false)}
                   loading={loading}
                   setLoading={setLoading}
